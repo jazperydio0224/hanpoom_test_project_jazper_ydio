@@ -1,0 +1,25 @@
+# docker compose up --build --detach
+# docker-compose down -v
+
+services:
+  mysql:
+    image: mysql:latest
+    env_file:
+      - .env
+    ports:
+      - '3312:3306'
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - docker-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: 100
+volumes:
+  mysql-data:
+networks:
+  docker-network:
+    driver: bridge
