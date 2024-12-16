@@ -1,0 +1,42 @@
+# docker compose -f docker-compose.prod.yml up --build -d
+# docker-compose down -v
+# docker exec -it <container_name> bash
+
+services:
+  hanpoom-test-project-api_prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - '3001:3001'
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./db/migrations:/usr/src/app/db/migrations
+      - ./package.json:/usr/src/app/package.json
+    networks:
+      - docker-network
+
+  mysql_db:
+    image: mysql
+    env_file:
+      - .env.prod
+    ports:
+      - '3306:3306'
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - docker-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: 100
+volumes:
+  mysql-data:
+networks:
+  docker-network:
+    driver: bridge

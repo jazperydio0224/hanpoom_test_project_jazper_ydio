@@ -1,0 +1,43 @@
+# docker compose -f docker-compose.yml up --build -d
+# docker-compose down -v
+# docker exec -it hanpoom_test_project_jazper_ydio-hanpoom-test-project-api-1 bash
+
+services:
+  hanpoom-test-project-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./db/migrations:/usr/src/app/db/migrations
+      - ./package.json:/usr/src/app/package.json
+    networks:
+      - docker-network
+
+  mysql_db:
+    image: mysql
+    env_file:
+      - .env
+    ports:
+      - '3307:3307'
+    restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - docker-network
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: 100
+volumes:
+  mysql-data:
+
+networks:
+  docker-network:
+    driver: bridge
